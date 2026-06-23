@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
-import static java.lang.Math.atan;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -11,13 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
-import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Configurable
 public class LaunchBoard
@@ -45,7 +39,7 @@ public class LaunchBoard
     private final double STOPPER_UP = 0.6;
 
 
-    LimeLightBoard CamBoard = new LimeLightBoard();
+    LocalizationBoard CamBoard = new LocalizationBoard();
     ElapsedTime stopperTimer = new ElapsedTime();
 
     private DcMotor intake;

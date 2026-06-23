@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +11,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-import org.firstinspires.ftc.teamcode.Mechanisms.LimeLightBoard;
+import org.firstinspires.ftc.teamcode.Mechanisms.LocalizationBoard;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -43,7 +42,7 @@ public class AutomaticAdjustmentTest extends OpMode
     private final double MIN_LAUNCH_ANGLE = Math.toRadians(30);
 
 
-    LimeLightBoard CamBoard = new LimeLightBoard();
+    LocalizationBoard CamBoard = new LocalizationBoard();
     private FileWriter writer;
 
     private Servo angleAdjuster;

@@ -13,14 +13,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class LocalizationBoard
 {
-    private Limelight3A limelight;
-    private GoBildaPinpointDriver pinpoint;
-
     private final double BEARING_OFFSET = 0;
     private final double CALIBRATION_CONSTANT = 40 * sqrt(3.62);
 
-    private double prevX = 0;
-    private double prevY = 0;
+    private Limelight3A limelight;
+    private GoBildaPinpointDriver pinpoint;
+
+    private double prevFieldX = 0;
+    private double prevFieldY = 0;
     private double prevHeading = 0;
     private double prevTagX = 0;
     private double prevTagY = 0;
@@ -61,8 +61,9 @@ public class LocalizationBoard
 
         pinpoint.update();
         Pose2D pos = pinpoint.getPosition();
-        double curX = pos.getX(DistanceUnit.INCH);
-        double curY = pos.getY(DistanceUnit.INCH);
+        double curFieldX = pos.getX(DistanceUnit.INCH);
+        double curFieldY = pos.getY(DistanceUnit.INCH);
+        // TODO check if heading is normalized to -180 - 180
         double curHeading = pos.getHeading(AngleUnit.RADIANS);
 
         // Determine whether camera sees tag or not
@@ -81,29 +82,44 @@ public class LocalizationBoard
             double ta = detection.getTa();
             distance = CALIBRATION_CONSTANT / sqrt(ta);
 
-            double tx = detection.getTx();
+            double tx = detection.getTx(); // TODO check if tx is degrees or radians
             bearing = tx - BEARING_OFFSET;
 
             prevTagX = distance * Math.cos(bearing);
             prevTagY = distance * Math.sin(bearing);
-
-            //Convert from robot relative to field relative
         }
         // Use odometry for positioning
         else
         {
-            double tagX = prevTagX - (curX - prevX);
-            double tagY = prevTagY - (curY - prevY);
+            // Calculate displacement in field plane first, then rotate in robot plane
+            // so that rotations during movement don't mess up the values
+            double dtFieldX = curFieldX - prevFieldX;
+            double dtFieldY = curFieldY - prevFieldY;
+            double prevHeadingCos = Math.cos(prevHeading);
+            double prevHeadingSin = Math.sin(prevHeading);
+            double dtRobotX = dtFieldX * prevHeadingCos + dtFieldY * prevHeadingSin;
+            double dtRobotY = -dtFieldX * prevHeadingSin + dtFieldY * prevHeadingCos;
+            // Tag coordinates in previous plane (aka what they would be if the robot hadn't rotated)
+            double prevPlaneTagX = prevTagX - dtRobotX;
+            double prevPlaneTagY = prevTagY - dtRobotY;
 
-            distance = Math.sqrt(tagX*tagX + tagY*tagY);
-            bearing = Math.atan2(tagX, tagY) - (curHeading - prevHeading);
+            double dtHeading = curHeading - prevHeading;
+            double dtHeadingCos = Math.cos(-dtHeading);
+            double dtHeadingSin = Math.sin(-dtHeading);
+            // Tag coordinates rotated to match this frame's plane
+            double tagX = prevPlaneTagX * dtHeadingCos - prevPlaneTagY * dtHeadingSin;
+            double tagY = prevPlaneTagX * dtHeadingSin + prevPlaneTagY * dtHeadingCos;
 
-            prevX = curX;
-            prevY = curY;
-            prevHeading = curHeading;
+            distance = Math.hypot(tagX, tagY);
+            bearing = Math.atan2(tagX, tagY);
+
             prevTagX = tagX;
             prevTagY = tagY;
         }
+
+        prevFieldX = curFieldX;
+        prevFieldY = curFieldY;
+        prevHeading = curHeading;
 
         switch (dimension)
         {
@@ -113,19 +129,13 @@ public class LocalizationBoard
         }
     }
 
-    //Returns all dimensions in a list
+    //Returns all dimensions in an array
     public double[] GetAprilTag()
     {
-        if (limelight == null) {return new double[] {999999, 999999};}
-        LLResult detection = limelight.getLatestResult();
-        double[] info = {999999, 999999};
-
-        if (detection.isValid())
-        {
-            double ta = detection.getTa();
-            info[0] = (CALIBRATION_CONSTANT / sqrt(ta));
-            info[1] = detection.getTx() - BEARING_OFFSET;
-        }
-        return info;
+        return new double[] {
+                GetAprilTag("range"),
+                GetAprilTag("bearing"),
+        };
     }
+
 }

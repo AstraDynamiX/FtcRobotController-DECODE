@@ -25,7 +25,7 @@ public class LocalizationBoard
     private double prevTagX = 0;
     private double prevTagY = 0;
 
-    private boolean cameraIsInvalid = false;
+    private boolean useCamera = false;
 
 
     public void init(HardwareMap hwMap, int id)
@@ -53,7 +53,7 @@ public class LocalizationBoard
 
     public double GetAprilTag(String dimension)
     {
-        boolean useCamera = true;
+        useCamera = true;
         LLResult detection = null;
 
         double distance;
@@ -63,7 +63,6 @@ public class LocalizationBoard
         Pose2D pos = pinpoint.getPosition();
         double curFieldX = pos.getX(DistanceUnit.INCH);
         double curFieldY = pos.getY(DistanceUnit.INCH);
-        // TODO check if heading is normalized to -180 - 180
         double curHeading = pos.getHeading(AngleUnit.RADIANS);
 
         // Determine whether camera sees tag or not
@@ -77,13 +76,11 @@ public class LocalizationBoard
         // Use camera for positioning
         if (useCamera)
         {
-            cameraIsInvalid = false;
-
             double ta = detection.getTa();
             distance = CALIBRATION_CONSTANT / sqrt(ta);
 
-            double tx = detection.getTx(); // TODO check if tx is degrees or radians
-            bearing = tx - BEARING_OFFSET;
+            double tx = detection.getTx();
+            bearing = Math.toRadians(tx - BEARING_OFFSET);
 
             prevTagX = distance * Math.cos(bearing);
             prevTagY = distance * Math.sin(bearing);
@@ -104,14 +101,14 @@ public class LocalizationBoard
             double prevPlaneTagY = prevTagY - dtRobotY;
 
             double dtHeading = curHeading - prevHeading;
-            double dtHeadingCos = Math.cos(-dtHeading);
-            double dtHeadingSin = Math.sin(-dtHeading);
+            double dtHeadingCos = Math.cos(dtHeading);
+            double dtHeadingSin = Math.sin(dtHeading);
             // Tag coordinates rotated to match this frame's plane
             double tagX = prevPlaneTagX * dtHeadingCos - prevPlaneTagY * dtHeadingSin;
             double tagY = prevPlaneTagX * dtHeadingSin + prevPlaneTagY * dtHeadingCos;
 
-            distance = Math.hypot(tagX, tagY);
-            bearing = Math.atan2(tagX, tagY);
+            distance = Math.hypot(tagY, tagX);
+            bearing = Math.atan2(tagY, tagX);
 
             prevTagX = tagX;
             prevTagY = tagY;
@@ -136,6 +133,15 @@ public class LocalizationBoard
                 GetAprilTag("range"),
                 GetAprilTag("bearing"),
         };
+    }
+
+    public boolean isUsingCamera()
+    {
+        return useCamera;
+    }
+    public double IMUHeading()
+    {
+        return Math.toDegrees(prevHeading);
     }
 
 }

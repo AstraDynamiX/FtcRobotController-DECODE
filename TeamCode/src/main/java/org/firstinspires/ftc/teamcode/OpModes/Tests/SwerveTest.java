@@ -49,13 +49,13 @@ public class SwerveTest extends OpMode
         /*if (gamepad1.right_trigger > 0.2) {crServo.setPower(gamepad1.right_trigger);}
         else {crServo.setPower(-gamepad1.left_trigger);}*/
 
-        // Control angle of wheel using joystick, where joystick points = where wheel moves
+        // Control angle of wheel using joystick, where joystick points = where wheel points
         // (release => wheel keeps position)
         if (Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y) > 0.5)
         {targetAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);}
 
         double currentAngle = servoAngle.getCurrentPosition();
-        // Calculates the shortest path automatically
+        // Calculate the shortest path
         double angleError =
                 Math.atan2(
                         Math.sin(targetAngle - currentAngle),
@@ -74,7 +74,7 @@ public class SwerveTest extends OpMode
         }
 
         crServo.set(targetAngle);
-        telemetry.addData("SERVO ANGLE", servoAngle.getCurrentPosition());
+        telemetry.addData("SERVO ANGLE", currentAngle);
         telemetry.addData("TARGET ANGLE:", targetAngle);
         telemetry.addData("INVERTED", inverted);
 

@@ -39,7 +39,7 @@ public class LaunchBoard
     private final double STOPPER_UP = 0.6;
 
 
-    LocalizationBoard CamBoard = new LocalizationBoard();
+    LocalizationBoard LocalizationBoard = new LocalizationBoard();
     ElapsedTime stopperTimer = new ElapsedTime();
 
     private DcMotor intake;
@@ -71,7 +71,7 @@ public class LaunchBoard
     {
         GOAL_ANGLE = Math.toRadians(GOAL_ANGLE_DEGREES);
 
-        CamBoard.init(hwMap, (redAlliance) ? 7 : 8);
+        LocalizationBoard.init(hwMap, (redAlliance) ? 7 : 8);
         //Initialize motors and servos
         intake = hwMap.get(DcMotor.class, "intake");
         leftFlywheel = initFlywheelMotor(hwMap, true, "leftFlywheel");
@@ -105,8 +105,8 @@ public class LaunchBoard
         return motor;
     }
 
-    public void start() {CamBoard.start();}
-    public void stop() {CamBoard.stop();}
+    public void start() {LocalizationBoard.start();}
+    public void stop() {LocalizationBoard.stop();}
 
 
     private enum FlywheelMode
@@ -141,7 +141,7 @@ public class LaunchBoard
                 leftFlywheel.setVeloCoefficients(FLYWHEEL_KP, FLYWHEEL_KI, 0);
                 rightFlywheel.setVeloCoefficients(FLYWHEEL_KP, FLYWHEEL_KI, 0);
 
-                distance = CamBoard.GetAprilTag("range");
+                distance = LocalizationBoard.GetAprilTag("range");
                 if (distance == 999999) return;
 
                 List<Double> launchAngles = FindAllLaunchAngles(distance, GOAL_HEIGHT, LAUNCH_HEIGHT, GOAL_ANGLE);
@@ -240,7 +240,7 @@ public class LaunchBoard
 
     public void TurretMovement()
     {
-        double aprilTagBearing = CamBoard.GetAprilTag("bearing");
+        double aprilTagBearing = LocalizationBoard.GetAprilTag("bearing");
         if (aprilTagBearing == 999999)
         {
             turret.set(turretCounterRotation);

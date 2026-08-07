@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Mechanisms.LocalizationBoard;
 @TeleOp(group = "tests")
 public class LimeLightAprilTagTrackingTest extends OpMode
 {
-    private final LocalizationBoard localizationBoard = new LocalizationBoard();
+    private final LocalizationBoard LocalizationBoard = new LocalizationBoard();
 
     private double[] tagDimensions;
 
@@ -21,29 +21,29 @@ public class LimeLightAprilTagTrackingTest extends OpMode
     @Override
     public void init()
     {
-        localizationBoard.init(hardwareMap, 7);
+        LocalizationBoard.init(hardwareMap, 7);
     }
 
     @Override
     public void start()
     {
-        localizationBoard.start();
+        LocalizationBoard.start();
     }
 
     @Override
     public void loop()
     {
-        tagDimensions = localizationBoard.GetAprilTag();
+        tagDimensions = LocalizationBoard.GetAprilTag();
 
-        telemetry.addData("USING CAMERA", localizationBoard.isUsingCamera());
+        telemetry.addData("USING CAMERA", LocalizationBoard.isUsingCamera());
         telemetry.addData("RANGE", tagDimensions[0]);
         telemetry.addData("BEARING", Math.toDegrees(tagDimensions[1]));
-        telemetry.addData("IMU HEADING", localizationBoard.IMUHeading());
+        telemetry.addData("IMU HEADING", LocalizationBoard.IMUHeading());
     }
 
     @Override
     public void stop()
     {
-        localizationBoard.stop();
+        LocalizationBoard.stop();
     }
 }

@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-@TeleOp(group = "tests")
-public class MotorIndividualTest extends OpMode
+@TeleOp(group = "tests basic")
+public class BasicMotorTest extends OpMode
 {
     private final String[] MOTOR_NAMES = {"leftFlywheel", "rightFlywheel", "turret"}; // Names used in Control Hub config
 

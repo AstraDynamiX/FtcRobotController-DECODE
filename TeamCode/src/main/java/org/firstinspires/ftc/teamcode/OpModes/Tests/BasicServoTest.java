@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-@TeleOp(group = "tests")
-public class ServoIndividualTest extends OpMode
+@TeleOp(group = "tests basic")
+public class BasicServoTest extends OpMode
 {
     private Servo servo1;
     private Servo servo2;

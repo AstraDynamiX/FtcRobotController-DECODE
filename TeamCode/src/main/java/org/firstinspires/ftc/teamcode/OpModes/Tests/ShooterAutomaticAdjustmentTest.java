@@ -22,7 +22,7 @@ import java.util.Locale;
 
 @Configurable
 @TeleOp(group = "tests")
-public class AutomaticAdjustmentTest extends OpMode
+public class ShooterAutomaticAdjustmentTest extends OpMode
 {
     public static double GOAL_HEIGHT = 42; //in; 38.19 - physical goal height
     private final double LAUNCH_HEIGHT = 13.4;

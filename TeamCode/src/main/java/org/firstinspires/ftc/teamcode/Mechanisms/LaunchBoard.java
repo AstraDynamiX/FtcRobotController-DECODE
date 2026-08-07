@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
+import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.TICKS_PER_REV;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -16,8 +18,7 @@ import java.util.List;
 @Configurable
 public class LaunchBoard
 {
-    private final double FLYWHEEL_RADIUS = 1.89; //in
-    private final double TICKS_PER_REV = 28; //Every GoBilda 5202 series motor has 28 TPR
+    private final double FLYWHEEL_RADIUS = 1.89; // in
     private final double LAUNCH_HEIGHT = 13.4;
 
     public static double GOAL_HEIGHT = 42; //in; 38.19 - physical goal height
@@ -62,7 +63,6 @@ public class LaunchBoard
     private double flywheelInput = 0;
     private double manualAdjusterAngle = 0.35;
     private double adjusterAngle = 0;
-    private double turretCounterRotation = 0;
     private double lastFlywheelSpeed = 0;
     private double ballsShot = 0;
 
@@ -243,7 +243,7 @@ public class LaunchBoard
         double aprilTagBearing = LocalizationBoard.GetAprilTag("bearing");
         if (aprilTagBearing == 999999)
         {
-            turret.set(turretCounterRotation);
+            turret.set(0);
             return;
         }
 
@@ -253,32 +253,25 @@ public class LaunchBoard
 
         //Turret limits
         if (turretPosition < -350 && turretTargetPosition - turretPosition < 0)
-        {turret.setTargetPosition((int) turretPosition + 20);}
+        {turret.setTargetPosition(-340);}
         else if (turretPosition > 275 && turretTargetPosition - turretPosition > 0)
-        {turret.setTargetPosition((int) turretPosition - 20);}
+        {turret.setTargetPosition(265);}
 
         else {turret.setTargetPosition((int) turretTargetPosition);}
 
         if (turret.atTargetPosition())
         {
             turret.setPositionCoefficient(0.175);
-            turret.set(0.09 + turretCounterRotation);
+            turret.set(0.09);
         }
         else
         {
             turret.setPositionCoefficient(0.15);
-            turret.set(0.1 + turretCounterRotation);
+            turret.set(0.1);
         }
     }
 
     public void AngleAdjusterMovement(double input) {manualAdjusterAngle += input;}
-    public void TurretCounterRotation(double input)
-    {
-        /*if (Math.abs(input) > 0.2) turretCounterRotation = input;
-        else turretCounterRotation = 0;*/
-        turret.setTargetPosition(turret.getCurrentPosition());
-        turret.set(input);
-    }
 
     // Getters
     public double getDistance() {return distance;}

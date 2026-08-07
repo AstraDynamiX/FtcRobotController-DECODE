@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.NormalizeAngle;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -280,11 +282,4 @@ public class Autonomous extends OpMode
         }
     }
 
-
-    private static double NormalizeAngle(double angle)
-    {
-        angle %= 2 * Math.PI;
-        if (angle < 0) angle += 2 * Math.PI;
-        return angle;
-    }
 }

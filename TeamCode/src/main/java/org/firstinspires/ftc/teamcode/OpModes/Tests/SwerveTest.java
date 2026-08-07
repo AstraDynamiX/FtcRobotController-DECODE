@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.WrapAngle;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
@@ -55,19 +50,19 @@ public class SwerveTest extends OpMode
         {targetAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);}
 
         double currentAngle = servoAngle.getCurrentPosition();
-        // Calculate the shortest path
+
+        // Angle optimization - if error is larger than 90 degrees switch direction of motor
+        // and turn to the diametrically opposite angle
         double angleError =
                 Math.atan2(
                         Math.sin(targetAngle - currentAngle),
                         Math.cos(targetAngle - currentAngle)
                 );
 
-        // Angle optimization - if error is larger than 90 degrees switch direction of motor
-        // and turn to the diametrically opposite angle
         if (Math.abs(angleError) > Math.PI / 2)
         {
             targetAngle += Math.PI;
-            targetAngle = wrapAngle(targetAngle);
+            targetAngle = WrapAngle(targetAngle);
 
             inverted = !inverted;
             motor.setInverted(inverted);
@@ -81,10 +76,4 @@ public class SwerveTest extends OpMode
         motor.set(-gamepad1.right_stick_y);
     }
 
-
-    // Convert 0 - 360 degree range angles to -180 - 180
-    public double wrapAngle(double angle)
-    {
-        return Math.atan2(Math.sin(angle), Math.cos(angle));
-    }
 }

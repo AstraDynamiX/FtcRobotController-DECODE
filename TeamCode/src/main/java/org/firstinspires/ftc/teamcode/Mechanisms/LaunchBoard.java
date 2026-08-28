@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Mechanisms;
 
-import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.TICKS_PER_REV;
+import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.WrapAngle;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -30,11 +30,10 @@ public class LaunchBoard
 
     public static double FLYWHEEL_KP = 11.2;
     public static double FLYWHEEL_KI = 14;
-
-    public static double TURRET_KP = 15;
     public static double FLYWHEEL_MULTIPLIER = 1.17;
-    public static double FLYWHEEL_UNCONSTRAINTED_MULTIPLIER = 1;
-    public static double FLYWHEEL_BIAS = 735;
+    public static double FLYWHEEL_BIAS = 830;
+
+    private final double TURRET_LIMITS = 220;
 
     private final double STOPPER_DOWN = 0.94;
     private final double STOPPER_UP = 0.6;
@@ -80,7 +79,7 @@ public class LaunchBoard
         turret = new MotorEx(hwMap, "turret", Motor.GoBILDA.RPM_435);
         turret.setRunMode(MotorEx.RunMode.PositionControl);
         turret.setCachingTolerance(0.001);
-        turret.setPositionCoefficient(0.15);
+        turret.setPositionCoefficient(0.14);
         turret.setPositionTolerance(5);
 
         //stopper = new ServoEx(hwMap, "stopper", 180, AngleUnit.DEGREES);
@@ -123,7 +122,7 @@ public class LaunchBoard
         else if (smallestLaunchSpeed == 999999) flywheelInput = FLYWHEEL_BIAS;
         else
         {
-            double launchSpeedTps = smallestLaunchSpeed * TICKS_PER_REV / (2 * 3.1415 * FLYWHEEL_RADIUS);
+            double launchSpeedTps = smallestLaunchSpeed * leftFlywheel.getCPR() / (2 * 3.1415 * FLYWHEEL_RADIUS);
             lastFlywheelSpeed = flywheelInput;
             flywheelInput = (FLYWHEEL_MULTIPLIER * launchSpeedTps) + FLYWHEEL_BIAS;
         }
@@ -240,35 +239,30 @@ public class LaunchBoard
 
     public void TurretMovement()
     {
-        double aprilTagBearing = LocalizationBoard.GetAprilTag("bearing");
-        if (aprilTagBearing == 999999)
+        double bearing = LocalizationBoard.GetAprilTag("bearing");
+        if (bearing == 999999)
         {
             turret.set(0);
             return;
         }
 
-        double bearingTicks = aprilTagBearing / 360 * TICKS_PER_REV;
+        double bearingTicks = bearing / (2*Math.PI) * turret.getCPR();
         double turretPosition = turret.getCurrentPosition();
-        double turretTargetPosition = turretPosition - (bearingTicks * TURRET_KP);
+
+        double turretTargetPosition;
+        if (LocalizationBoard.IsUsingCamera())
+        {turretTargetPosition = turretPosition - bearingTicks;}
+        else {turretTargetPosition = -bearingTicks;}
 
         //Turret limits
-        if (turretPosition < -350 && turretTargetPosition - turretPosition < 0)
-        {turret.setTargetPosition(-340);}
-        else if (turretPosition > 275 && turretTargetPosition - turretPosition > 0)
-        {turret.setTargetPosition(265);}
+        if (turretPosition < -TURRET_LIMITS && turretTargetPosition - turretPosition < 0)
+        {turret.setTargetPosition((int)-TURRET_LIMITS+2);}
+        else if (turretPosition > TURRET_LIMITS && turretTargetPosition - turretPosition > 0)
+        {turret.setTargetPosition((int)TURRET_LIMITS-2);}
 
         else {turret.setTargetPosition((int) turretTargetPosition);}
 
-        if (turret.atTargetPosition())
-        {
-            turret.setPositionCoefficient(0.175);
-            turret.set(0.09);
-        }
-        else
-        {
-            turret.setPositionCoefficient(0.15);
-            turret.set(0.1);
-        }
+        turret.set(0.1);
     }
 
     public void AngleAdjusterMovement(double input) {manualAdjusterAngle += input;}
@@ -276,8 +270,9 @@ public class LaunchBoard
     // Getters
     public double getDistance() {return distance;}
     public double getLaunchAngle() {return Math.toDegrees(launchAngle);}
-    public double getTurretPosition() {return turret.getCurrentPosition();}
-    public double getFlywheelSpeed() {return flywheelInput;}
+    public double getTurretPosition() {return WrapAngle(turret.getCurrentPosition() / turret.getCPR() * 360);}
+    public double getFlywheelInput() {return flywheelInput;}
+    public double getFlywheelSpeed() {return rightFlywheel.getVelocity();}
 
     // ------ Intake state machine ------
 
@@ -380,7 +375,7 @@ public class LaunchBoard
         );
     }
 
-    //For angles outside of the bounds of the angle adjuster, we compensate with speed
+    //For angles outside the bounds of the angle adjuster, we compensate with speed
     private double UnconstrainedLaunchSpeed(double launchAngle, double x, double y, double h)
     {
         double g = 386.09;

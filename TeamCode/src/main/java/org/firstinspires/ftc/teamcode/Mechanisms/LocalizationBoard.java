@@ -25,6 +25,7 @@ public class LocalizationBoard
     private double prevTagX = 0;
     private double prevTagY = 0;
 
+    private double cameraOrientation = 0;
     private boolean useCamera = false;
 
 
@@ -56,8 +57,8 @@ public class LocalizationBoard
         useCamera = true;
         LLResult detection = null;
 
-        double distance;
-        double bearing;
+        double distance = 999999;
+        double bearing = 999999;
 
         pinpoint.update();
         Pose2D pos = pinpoint.getPosition();
@@ -80,13 +81,13 @@ public class LocalizationBoard
             distance = CALIBRATION_CONSTANT / sqrt(ta);
 
             double tx = detection.getTx();
-            bearing = Math.toRadians(tx - BEARING_OFFSET);
+            bearing = Math.toRadians(tx - BEARING_OFFSET) - cameraOrientation;
 
             prevTagX = distance * Math.cos(bearing);
             prevTagY = distance * Math.sin(bearing);
         }
         // Use odometry for positioning
-        else
+        /*else
         {
             // Calculate displacement in field plane first, then rotate in robot plane
             // so that rotations during movement don't mess up the values
@@ -112,7 +113,7 @@ public class LocalizationBoard
 
             prevTagX = tagX;
             prevTagY = tagY;
-        }
+        }*/
 
         prevFieldX = curFieldX;
         prevFieldY = curFieldY;
@@ -135,11 +136,17 @@ public class LocalizationBoard
         };
     }
 
-    public boolean isUsingCamera()
+    // Set camera angle relative to IMU angle
+    public void SetCameraOrientation(double orientation)
+    {
+        cameraOrientation = orientation;
+    }
+
+    public boolean IsUsingCamera()
     {
         return useCamera;
     }
-    public double IMUHeading()
+    public double GetIMUHeading()
     {
         return Math.toDegrees(prevHeading);
     }

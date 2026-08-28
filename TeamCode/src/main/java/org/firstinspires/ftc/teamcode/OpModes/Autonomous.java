@@ -51,7 +51,7 @@ public class Autonomous extends OpMode
 
 
     //Blue close
-    private final Pose startClose = new Pose(25.083, 131.242, Math.toRadians(143.5));
+    private final Pose startClose = new Pose(25.083, 131.242, Math.toRadians(143));
     private final Pose shootClose = new Pose(54, 90, Math.toRadians(135));
     private final Pose intake1StartClose = new Pose(52.297, 87.270, Math.toRadians(180));
     private final Pose intake1EndClose = new Pose(19.299, 87.270, Math.toRadians(180));
@@ -62,8 +62,8 @@ public class Autonomous extends OpMode
     private final Pose endClose = new Pose(24.919, 79.978, Math.toRadians(-135));
 
     //Blue far
-    private final Pose startFar = new Pose(56,8, Math.toRadians(90));
-    private final Pose shootFar = new Pose(57.730,13.514, Math.toRadians(110));
+    private final Pose startFar = new Pose(56,10, Math.toRadians(90));
+    private final Pose shootFar = new Pose(/*57.7*/37,/*13.5*/10, Math.toRadians(/*110*/90));
     private final Pose intake1StartFar = new Pose(55.865, 37.243, Math.toRadians(180));
     private final Pose intake1EndFar = new Pose(20.541, 37.243, Math.toRadians(180));
     private final Pose intake2StartFar = new Pose(20.919, 44.838, Math.toRadians(-95));
@@ -79,7 +79,7 @@ public class Autonomous extends OpMode
     private boolean pathStarted = false;
     private boolean actionStarted = false;
 
-    //Trajectory selection booleans
+    // Trajectory selection booleans
     boolean redAlliance = false;
     boolean closeTrajectory = true;
     boolean confirmed = false;
@@ -103,11 +103,7 @@ public class Autonomous extends OpMode
     public void init_loop()
     {
         if (confirmed)
-        {
-            telemetry.addData("CONFIRMED", "");
-            telemetry.addData("ALLIANCE", (redAlliance) ? "red" : "blue");
-            telemetry.addData("TRAJECTORY", (closeTrajectory) ? "close" : "far");
-        }
+        {telemetry.addData("CONFIRMED", "");}
         else
         {
             if (gamepad1.bWasPressed())
@@ -116,17 +112,23 @@ public class Autonomous extends OpMode
             if (gamepad1.xWasPressed())
             {closeTrajectory = !closeTrajectory;}
 
-            if (gamepad1.a)
+            if (gamepad1.aWasPressed())
             {
                 confirmed = true;
                 LaunchBoard.init(hardwareMap, redAlliance);
             }
 
             telemetry.addData("", "() - change alliance, [] - change trajectory, X - confirm");
-            telemetry.addData("ALLIANCE", (redAlliance) ? "red" : "blue");
-            telemetry.addData("TRAJECTORY", (closeTrajectory) ? "close" : "far");
-
         }
+
+        telemetry.addData("ALLIANCE", (redAlliance) ? "red" : "blue");
+        telemetry.addData("TRAJECTORY", (closeTrajectory) ? "close" : "far");
+
+        telemetry.addData("","");
+        telemetry.addData("POSE", startFar.getX());
+        telemetry.addData("POSE", shootFar.getX());
+        telemetry.addData("POSE", MirrorPose(startFar, true).getX());
+        telemetry.addData("POSE", MirrorPose(shootFar, true).getX());
     }
 
     @Override
@@ -156,14 +158,14 @@ public class Autonomous extends OpMode
         {
             StartRoutine(startFar);
 
-            AddRoutineStep(shootFar, () -> LaunchBoard.Rev(), 1, 0, 0);
-            AddRoutineStep(intake1StartFar, () -> LaunchBoard.Shoot(), 1, SHOOT_TIME, SHOOT_DELAY);
+            AddRoutineStep(shootFar, () -> LaunchBoard.Idle(), 1, 0, 0);
+            /*AddRoutineStep(intake1StartFar, () -> LaunchBoard.Shoot(), 1, SHOOT_TIME, SHOOT_DELAY);
             AddRoutineStep(intake1EndFar, () -> LaunchBoard.Intake(), INTAKE_SPEED, 0, 0);
             AddRoutineStep(shootFar, () -> LaunchBoard.Rev(), 1, 0, 0);
             AddRoutineStep(intake2StartFar, () -> LaunchBoard.Shoot(), 1, SHOOT_TIME, SHOOT_DELAY);
             AddRoutineStep(intake2EndFar, () -> LaunchBoard.Intake(), INTAKE_SPEED, 0, 0);
             AddRoutineStep(shootFar, () -> LaunchBoard.Rev(), 0.8, 0, 0);
-            AddRoutineStep(endFar, () -> LaunchBoard.Shoot(), 1, SHOOT_TIME, SHOOT_DELAY);
+            AddRoutineStep(endFar, () -> LaunchBoard.Shoot(), 1, SHOOT_TIME, SHOOT_DELAY);*/
         }
     }
 
@@ -221,7 +223,7 @@ public class Autonomous extends OpMode
 
     private Pose AlliancePose(Pose bluePose)
     {
-        return redAlliance ? bluePose : MirrorPose(bluePose, true);
+        return (redAlliance) ? (MirrorPose(bluePose, true)) : (bluePose);
     }
 
     /** "Routine" means path chain that follows this structure:

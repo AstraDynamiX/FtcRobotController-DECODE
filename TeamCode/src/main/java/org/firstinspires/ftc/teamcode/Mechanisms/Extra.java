@@ -2,10 +2,6 @@ package org.firstinspires.ftc.teamcode.Mechanisms;
 
 public class Extra
 {
-    //Every GoBilda 5202 series motor has 28 TPR
-    public static double TICKS_PER_REV = 28;
-
-
     // Convert 0 - 360 degree range angles to -180 - 180
     public static double WrapAngle(double angle)
     {

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.samples;
+package org.firstinspires.ftc.teamcode.PedroSamples;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -8,13 +8,15 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.RunCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import com.seattlesolvers.solverslib.util.TelemetryData;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous
+@Autonomous(group = "zPedroSample")
 public class PedroAutoSample extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);
@@ -106,15 +108,14 @@ public class PedroAutoSample extends CommandOpMode {
     public void initialize() {
         super.reset();
 
-
         // Initialize follower
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
 
-
         // Schedule the autonomous sequence
         schedule(
+                new RunCommand(() -> follower.update()),
                 // Score preload
                 new FollowPathCommand(follower, scorePreload),
                 openOuttakeClaw(),
@@ -148,7 +149,6 @@ public class PedroAutoSample extends CommandOpMode {
     @Override
     public void run() {
         super.run();
-        follower.update();
 
         telemetryData.addData("X", follower.getPose().getX());
         telemetryData.addData("Y", follower.getPose().getY());

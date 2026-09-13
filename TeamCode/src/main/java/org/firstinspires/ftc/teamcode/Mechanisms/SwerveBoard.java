@@ -39,8 +39,8 @@ public class SwerveBoard
     {
         for (int i = 0; i < 4; i++)
         {
-            motors[i] = initMotor(hwMap, false, Arrays.toString(POSITION_NAMES) + "Wheel");
-            servos[i] = initServo(hwMap, Arrays.toString(POSITION_NAMES) + "Pod", i);
+            motors[i] = initMotor(hwMap, false, Arrays.toString(POSITION_NAMES) + "Motor");
+            servos[i] = initServo(hwMap, Arrays.toString(POSITION_NAMES) + "Servo", i);
         }
     }
 
@@ -83,8 +83,6 @@ public class SwerveBoard
             wheelSpeeds[i] = wheelSpeed;
             servos[i].set(Math.toRadians(wheelAngle));
         }
-
-        // TODO angle optimisation (from SwerveTest)
 
         // Scale down all wheel speeds proportionally if a speed surpasses the max speed
         double denominator = maxSpeed;

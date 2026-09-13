@@ -29,7 +29,7 @@ public class TeleOp extends OpMode {
 
     private int launchState = 0;
     private double flywheelMultiplier = 300;
-    private boolean autoAdjustment = false;
+    private boolean autoAdjustment = true;
     private boolean robotCentricDrive = true;
     private boolean outtake = false;
 
@@ -83,8 +83,8 @@ public class TeleOp extends OpMode {
         );
         follower.update();
 
-        /*if (gamepad1.optionsWasPressed())
-        {autoAdjustment = !autoAdjustment;}*/
+        if (gamepad1.optionsWasPressed())
+        {autoAdjustment = !autoAdjustment;}
 
         if (gamepad1.shareWasPressed())
         {robotCentricDrive = !robotCentricDrive;}
@@ -125,8 +125,17 @@ public class TeleOp extends OpMode {
         if (gamepad1.dpadDownWasPressed())
         {flywheelMultiplier -= 25;}
 
+        if (gamepad1.dpadRightWasPressed())
+        {LaunchBoard.AngleAdjusterMovement(-0.05);}
+
+        if (gamepad1.dpadLeftWasPressed())
+        {LaunchBoard.AngleAdjusterMovement(0.05);}
+
         //Functions that get called every loop with no input condition
         LaunchBoard.UpdateLaunch(autoAdjustment, flywheelMultiplier);
+        if (autoAdjustment) {LaunchBoard.TurretMovement();}
+        else {LaunchBoard.TurretLockPosition(0);}
+        //LaunchBoard.TurretCounterRotation(gamepad1.right_stick_x);
 
         // ------ Telemetry ------
         telemetry.addData("ROBOT CENTRIC", robotCentricDrive);
@@ -134,6 +143,7 @@ public class TeleOp extends OpMode {
         telemetry.addData("DISTANCE", LaunchBoard.getDistance());
         telemetry.addData("LAUNCH ANGLE", LaunchBoard.getLaunchAngle());
         telemetry.addData("LAUNCH SPEED", LaunchBoard.getFlywheelSpeed());
+        telemetry.addData("TURRET POSITION", LaunchBoard.getTurretPosition());
 
         if (!autoAdjustment)
         {telemetry.addData("FLYWHEEL MULTIPLIER", flywheelMultiplier);}

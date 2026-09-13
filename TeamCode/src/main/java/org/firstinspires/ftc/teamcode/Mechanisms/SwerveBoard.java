@@ -19,11 +19,13 @@ public class SwerveBoard
     private final double RPM = 5800; // Tested RPM for GoBilda 5202 series motor
     private final double NOISE_FILTER_COEF = 0.5; // 0 = angle doesn't change, 1 = no filtering
 
-    private final double[] WHEEL_DISTANCE_X = {0, 0, 0, 0};
-    private final double[] WHEEL_DISTANCE_Y = {0, 0, 0, 0};
-
     // Pods are initialized in this order in the lists: left front, right front, left back, right back
     private final String[] POSITION_NAMES = {"lf", "rf", "lb", "rb"};
+
+    private final double ROBOT_SIZE_X = 0; //TODO
+    private final double ROBOT_SIZE_Y = 0; //TODO
+    private final double[] WHEEL_DISTANCE_X = {ROBOT_SIZE_X/2, ROBOT_SIZE_X/2, -ROBOT_SIZE_X/2, -ROBOT_SIZE_X/2};
+    private final double[] WHEEL_DISTANCE_Y = {ROBOT_SIZE_Y/2, -ROBOT_SIZE_Y/2, ROBOT_SIZE_Y/2, -ROBOT_SIZE_Y/2};
 
     MotorEx[] motors;
     CRServoEx[] servos;
@@ -46,7 +48,7 @@ public class SwerveBoard
     {
         MotorEx motor = new MotorEx(hwMap, name, TICKS_PER_REV, RPM);
         motor.setRunMode(MotorEx.RunMode.VelocityControl);
-        motor.setVeloCoefficients(0, 0, 0);
+        motor.setVeloCoefficients(1, 0, 0); //TODO
         motor.setInverted(inverted);
         motor.setCachingTolerance(0.01);
         return motor;
@@ -56,7 +58,7 @@ public class SwerveBoard
     {
         servoEncoders[number] = new AbsoluteAnalogEncoder(hwMap, name + "Input");
         CRServoEx servo = new CRServoEx(hwMap, name, servoEncoders[number], CRServoEx.RunMode.OptimizedPositionalControl);
-        servo.setPIDF(new PIDFCoefficients(0, 0, 0, 0)); //TODO
+        servo.setPIDF(new PIDFCoefficients(1, 0, 0, 0)); //TODO
         return servo;
     }
 
@@ -75,7 +77,7 @@ public class SwerveBoard
             double currentWheelAngle = servoEncoders[i].getCurrentPosition();
             // Simple exponential filtering to reduce noise (f = filtered)
             fCurrentWheelAngle = NOISE_FILTER_COEF * currentWheelAngle + (1 - NOISE_FILTER_COEF) * fCurrentWheelAngle;
-            // Cosine compensation - reduce wheel speed based on angle error to reduce...
+            // Cosine compensation - reduce wheel speed based on angle error
             wheelSpeed *= Math.cos(wheelAngle - fCurrentWheelAngle);
 
             wheelSpeeds[i] = wheelSpeed;

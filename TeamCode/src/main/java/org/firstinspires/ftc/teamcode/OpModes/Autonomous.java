@@ -63,7 +63,7 @@ public class Autonomous extends OpMode
 
     //Blue far
     private final Pose startFar = new Pose(56,10, Math.toRadians(90));
-    private final Pose shootFar = new Pose(/*57.7*/37,/*13.5*/10, Math.toRadians(/*110*/90));
+    private final Pose shootFar = new Pose(57.7,13.5, Math.toRadians(110));
     private final Pose intake1StartFar = new Pose(55.865, 37.243, Math.toRadians(180));
     private final Pose intake1EndFar = new Pose(20.541, 37.243, Math.toRadians(180));
     private final Pose intake2StartFar = new Pose(20.919, 44.838, Math.toRadians(-95));

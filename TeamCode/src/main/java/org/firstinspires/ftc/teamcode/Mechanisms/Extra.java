@@ -17,6 +17,7 @@ public class Extra
     }
 
     // Calculates actual target angle when fed target is wrapped, but feedback angle is not
+    // (ex. joystick input)
     public static double ComputeTargetAngle(double desiredAngle, double currentAngle)
     {
         double error = WrapAngle(desiredAngle - currentAngle);

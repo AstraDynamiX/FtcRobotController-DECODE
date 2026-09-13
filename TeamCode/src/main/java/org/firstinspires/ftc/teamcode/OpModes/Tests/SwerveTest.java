@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.ComputeTargetAngle;
 import static org.firstinspires.ftc.teamcode.Mechanisms.Extra.WrapAngle;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -20,6 +21,8 @@ public class SwerveTest extends OpMode
     private AbsoluteAnalogEncoder servoAngle;
     private MotorEx motor;
 
+    private double desiredAngle = 0;
+    private double currentAngle = 0;
     private double targetAngle = 0;
     private boolean inverted = false;
 
@@ -41,39 +44,37 @@ public class SwerveTest extends OpMode
     @Override
     public void loop()
     {
-        /*if (gamepad1.right_trigger > 0.2) {crServo.setPower(gamepad1.right_trigger);}
-        else {crServo.setPower(-gamepad1.left_trigger);}*/
+        currentAngle = servoAngle.getCurrentPosition();
 
         // Control angle of wheel using joystick, where joystick points = where wheel points
         // (release => wheel keeps position)
         if (Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y) > 0.5)
-        {targetAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);}
-
-        double currentAngle = servoAngle.getCurrentPosition();
-
-        // Angle optimization - if error is larger than 90 degrees switch direction of motor
-        // and turn to the diametrically opposite angle
-        double angleError =
-                Math.atan2(
-                        Math.sin(targetAngle - currentAngle),
-                        Math.cos(targetAngle - currentAngle)
-                );
-
-        if (Math.abs(angleError) > Math.PI / 2)
         {
-            targetAngle += Math.PI;
-            targetAngle = WrapAngle(targetAngle);
+            desiredAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 2;
+            targetAngle = ComputeTargetAngle(desiredAngle, currentAngle);
 
-            inverted = !inverted;
+            // Angle optimization - if error is larger than 90 degrees switch direction of motor
+            // and turn to the diametrically opposite angle
+            double angleError = WrapAngle(targetAngle - currentAngle);
+
+            if (Math.abs(angleError) > Math.PI / 2)
+            {
+                targetAngle = WrapAngle(targetAngle + Math.PI);
+                inverted = true;
+            }
+            else
+            {inverted = false;}
+
             motor.setInverted(inverted);
         }
 
         crServo.set(targetAngle);
+        
+        motor.set(-gamepad1.right_stick_y * 0.9);
+
         telemetry.addData("SERVO ANGLE", currentAngle);
         telemetry.addData("TARGET ANGLE:", targetAngle);
         telemetry.addData("INVERTED", inverted);
-
-        motor.set(-gamepad1.right_stick_y);
     }
 
 }

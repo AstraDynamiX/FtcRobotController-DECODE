@@ -77,7 +77,9 @@ public class MotorPositionalControlTest extends OpMode
         targetAngleTicks = targetAngle / (2 * Math.PI) * TICKS_PER_REV * GEAR_RATIO;
 
         motor.setTargetPosition((int) targetAngleTicks);
-        if (desiredAngle > -LIMIT && desiredAngle < LIMIT && motorControl) {motor.set(0.12);}
+        if (targetAngle > -LIMIT && targetAngle < LIMIT && motorControl) {motor.set(0.12);}
+        else {motor.set(0);}
+
         telemetry.addData("AUTO CONTROL", !joystickControl);
         telemetry.addData("MOTOR CONTROL", motorControl);
         telemetry.addData("", "");
